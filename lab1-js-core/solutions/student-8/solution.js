@@ -20,7 +20,7 @@ function simpleTask() {
 function getReviewerNumber(number, lab) {
     // 2.1 Функция определяющая номер ревьюера для вашей группы по вашему номеру и номеру лабораторной работы
     const totalStudents = 30;   // всего студентов в группе
-    return ((number + lab - 1) % students) + 1;
+    return ((number + lab - 1) % totalStudents) + 1;
 }
 
 function getVariant(number, variants) {
