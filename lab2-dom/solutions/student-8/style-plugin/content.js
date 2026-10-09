@@ -102,7 +102,7 @@ function initGriffindorTheme() {
         body.griffindor-mode img {
             filter: sepia(0.3) brightness(0.9) !important;
         }
-    `;        
+    `;
     document.head.appendChild(style);
 
     // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
@@ -110,23 +110,26 @@ function initGriffindorTheme() {
 
     function toggleTheme() {
         if (isActive) {
-            // ВКЛЮЧАЕМ
+            // ===== ВКЛЮЧАЕМ =====
             document.body.classList.add('griffindor-mode');
 
-            // Дополнительно меняем стили через JS (требование использовать методы DOM)
-            // 4. parentElement + 5. children — обходим всех детей контейнера
-            if (pageWrapper && pageWrapper.children) {
-                for (let i = 0; i < pageWrapper.children.length; i++) {
-                    const child = pageWrapper.children[i];
-                    if (child.classList && child.classList.contains('portlet-boundary')) {
-                        child.style.marginBottom = '10px';
-                    }
-                }
+            // Используем menuElement (замечание 2)
+            if (menuElement) {
+                menuElement.style.borderBottom = '2px solid #eeba30';
+                menuElement.style.backgroundColor = '#2b0606';
             }
 
-            // Меняем цвет ссылок через JS (не только через CSS)
+            // Используем allCards (замечание 7)
+            allCards.forEach(function(card) {
+                card.style.borderColor = '#eeba30';
+            });
+
+            // Используем parentElement внутри allLinks (замечание 3)
             allLinks.forEach(function(link) {
                 link.style.color = '#ffd966';
+                if (link.parentElement) {
+                    link.parentElement.style.backgroundColor = '#2b0606';
+                }
             });
 
             // Меняем заголовки через JS
@@ -134,19 +137,50 @@ function initGriffindorTheme() {
                 heading.style.color = '#eeba30';
             });
 
+            // Используем children — обходим прямых потомков body (замечание 4)
+            if (document.body.children) {
+                for (let i = 0; i < document.body.children.length; i++) {
+                    const child = document.body.children[i];
+                    child.style.borderColor = '#eeba30';
+                }
+            }
+
             console.log('[Гриффиндор] Тема включена');
+
         } else {
-            // ВЫКЛЮЧАЕМ
+            // ===== ВЫКЛЮЧАЕМ =====
             document.body.classList.remove('griffindor-mode');
 
-            // Возвращаем стили ссылок
-            allLinks.forEach(function(link) {
-                link.style.color = '';
+            // Сбрасываем menuElement (замечание 5)
+            if (menuElement) {
+                menuElement.style.borderBottom = '';
+                menuElement.style.backgroundColor = '';
+            }
+
+            // Сбрасываем allCards
+            allCards.forEach(function(card) {
+                card.style.borderColor = '';
             });
 
+            // Сбрасываем allLinks и их parents (замечание 5)
+            allLinks.forEach(function(link) {
+                link.style.color = '';
+                if (link.parentElement) {
+                    link.parentElement.style.backgroundColor = '';
+                }
+            });
+
+            // Сбрасываем allHeadings
             allHeadings.forEach(function(heading) {
                 heading.style.color = '';
             });
+
+            // Сбрасываем borderColor у детей body (замечание 5)
+            if (document.body.children) {
+                for (let i = 0; i < document.body.children.length; i++) {
+                    document.body.children[i].style.borderColor = '';
+                }
+            }
 
             console.log('[Гриффиндор] Тема выключена');
         }
@@ -158,7 +192,6 @@ function initGriffindorTheme() {
 
     // ===== СОЗДАНИЕ КНОПКИ =====
     function createToggleButton() {
-        // Проверяем, что кнопки ещё нет
         if (document.getElementById('griffindor-toggle-btn')) {
             return;
         }
@@ -167,7 +200,6 @@ function initGriffindorTheme() {
         button.id = 'griffindor-toggle-btn';
         button.title = 'Переключить тему Гриффиндора';
 
-        // Стили кнопки
         Object.assign(button.style, {
             width: '40px',
             height: '40px',
@@ -187,13 +219,11 @@ function initGriffindorTheme() {
             userSelect: 'none'
         });
 
-        // Клик — переключение
         button.addEventListener('click', function() {
             isActive = !isActive;
             toggleTheme();
         });
 
-        // Наведение — увеличиваем
         button.addEventListener('mouseenter', function() {
             button.style.transform = 'scale(1.1)';
         });
@@ -204,13 +234,12 @@ function initGriffindorTheme() {
         document.body.appendChild(button);
         updateButton();
 
-        // Если тема была включена ранее — включаем сразу
         if (isActive) {
             toggleTheme();
         }
     }
 
-    // ===== ОБНОВЛЕНИЕ ИКОНКИ КНОПКИ =====
+    // ===== ОБНОВЛЕНИЕ ИКОНКИ КНОПКИ (замечание 8) =====
     function updateButton() {
         const btn = document.getElementById('griffindor-toggle-btn');
         if (btn) {
@@ -218,6 +247,15 @@ function initGriffindorTheme() {
             btn.title = isActive
                 ? 'Тема Гриффиндора: ВКЛ'
                 : 'Тема Гриффиндора: ВЫКЛ';
+
+            // Явный индикатор статуса через цвет
+            if (isActive) {
+                btn.style.backgroundColor = '#eeba30';
+                btn.style.color = '#740001';
+            } else {
+                btn.style.backgroundColor = '#740001';
+                btn.style.color = '#eeba30';
+            }
         }
     }
 
@@ -229,5 +267,4 @@ function initGriffindorTheme() {
     }
 }
 
-// Запускаем
 initGriffindorTheme();
